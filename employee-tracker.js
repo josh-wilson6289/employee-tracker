@@ -13,22 +13,23 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadID);
+  console.log("connected as id " + connection.threadI);
   init();
 })
+
 
 // Initiallizes program, asks user which table they'd like to view
 function init() {
   return inquirer.prompt([
     {
       type: "list",
-      name: "options",
+      name: "table",
       choices: ["Department", "Role", "Employee"],
       message: "Hello. Which table would you like to view?"
     }
     ])
     .then(answer => {
-      viewTable(answer.options);
+      viewTable(answer.table);
     });
 }
 
@@ -46,12 +47,12 @@ function tableChange(table) {
   return inquirer.prompt([
   {
     type: "list",
-    name: "changeTable",
+    name: "choices",
     choices: ["Add to table", "Edit table", "Exit"]
   }
   ])
     .then(answer => {
-      switch(answer.changeTable) {
+      switch(answer.choices) {
         case "Add to table":
           newEntry(table);
           break;
@@ -66,7 +67,66 @@ function tableChange(table) {
 }
 
 function newEntry(table) {
-  console.log(`Adding to ${table}`);
+  let questions = [];
+  let queryString = "";
+  console.log(table);
+
+  switch(table){
+    case "Department":
+      questions.push("Department:");
+        
+        return inquirer.prompt([
+          {
+            type: "input",
+            name: "name",
+            message: questions[0]
+          }
+        ])
+          .then(answer => {
+            queryString = `INSERT INTO department (name) VALUES ('${answer.name}')`
+            console.log(queryString);
+          })
+    break;
+    case "Role":
+      questions.push("Title:", "Salary:", "Department:");
+      queryString = "SELECT * FROM department";
+
+      connection.query(queryString, function(err, res) {
+        if (err) throw err;
+        
+        inquirer.prompt([
+          {
+            type: "input",
+            name: "title",
+            message: questions[0]
+          },
+          {
+           type: "input",
+           name: "salary",
+           message: questions[1] 
+          },
+          {
+            type: "list",
+            name: "departmentId",
+            choices: res.map(department=>{
+              return {
+                name: department.name,
+                value: department.id
+              }
+            }),
+            message: questions[2],
+          }
+        ])
+        .then(answer => {
+          queryString = `INSERT INTO role (title, salary, department_id) VALUES ('${answer.title}, '${answer.salary}', '${answer.departmentId}')`;
+          console.log(queryString);
+        });
+      })
+     
+    break;
+  }
+
+  
 }
 
 function editTable(table) {
