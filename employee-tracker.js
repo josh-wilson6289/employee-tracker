@@ -28,21 +28,21 @@ function init() {
     }
     ])
     .then(answer => {
-      viewTable(answer);
+      viewTable(answer.options);
     });
 }
 
-function viewTable(answer) {
-  let queryString = `SELECT * FROM ${answer.options}`; 
+function viewTable(table) {
+  let queryString = `SELECT * FROM ${table}`; 
   
-  connection.query(queryString, function(err, result, fields) {
+  connection.query(queryString, function(err, result) {
     if (err) throw err;
     console.table(result);
-    tableChange();
+    tableChange(table);
   });
 }
 
-function tableChange() {
+function tableChange(table) {
   return inquirer.prompt([
   {
     type: "list",
@@ -53,10 +53,10 @@ function tableChange() {
     .then(answer => {
       switch(answer.changeTable) {
         case "Add to table":
-          console.log("adding to table");
+          newEntry(table);
           break;
         case "Edit table": 
-          console.log("editing table");
+          editTable(table);
           break;
         case "Exit":
           console.log("Exiting");
@@ -65,6 +65,13 @@ function tableChange() {
     })
 }
 
+function newEntry(table) {
+  console.log(`Adding to ${table}`);
+}
+
+function editTable(table) {
+  console.log(`Editing ${table}`)
+}
 
 // // Code block to add to table
 // function add(){
