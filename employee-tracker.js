@@ -91,7 +91,8 @@ function newEntry(table) {
       questions.push("Title:", "Salary:", "Department:");
       queryString = "SELECT * FROM department";
 
-      connection.query(queryString, function(err, res) {
+      connection.query(queryString, function(err, res) { 
+
         if (err) throw err;
         
         inquirer.prompt([
