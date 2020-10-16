@@ -1,6 +1,7 @@
 // Dependencies
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+const { allowedNodeEnvironmentFlags } = require("process");
 
 // Connect to mysql
 var connection = mysql.createConnection({
@@ -40,7 +41,7 @@ function init() {
     })
 }
 
-// Code block to add 
+// Code block to add to table
 function add(){
   return inquirer.prompt([
     {
@@ -55,24 +56,72 @@ function add(){
     })
 } 
 
+// Uses inquirer to ask correct questions for given table
 function addToTable(selectedTable) {
   let questions = [];
   
   switch(selectedTable){
     case 'Departments':
-      console.log("Selected table is departments");
+      questions.push("New department name:");
+      inquirer.prompt([
+        {
+          type: "input",
+          name: "department",
+          message: questions[0]
+        }
+      ])
+        .then(answer => {
+          addDepartment(answer);
+        });
       break;
     case 'Roles':
-      console.log("Selected table is roles");
+      questions.push("Title:", "Salary:", "Department:");
+      inquirer.prompt([
+        {
+          type: "input",
+          name: "title",
+          message: questions[0]
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: questions[1]
+        },
+        {
+          type: "input",
+          name: "department",
+          message: questions[2]
+        }
+      ])
+        .then(answer => {
+          addRole(answer);
+        })
       break;
     case 'Employees':
-      console.log("Selected table is employees");
+      questions.push("First name:", "Last name:", "Role:", "Manager:")
       break;
   }
 }
 
+function addDepartment(answer) {
+  let id = Math.floor(Math.random() * 1000);
+  let queryString = `INSERT INTO department (id, name) VALUES ('${id}', '${answer.department}')`;
+  
+  connection.query(queryString, function (err, result) {
+    if (err) throw err;
+    console.log("Record inserted" + result);
+  });
+}
 
+function addRole(answer) {
+  let id = Math.floor(Math.random() * 1000);
+  let queryString = `INSERT INTO role (id, title, salary, department_id) VALUES ('${id}', '${answer.title}', '${answer.salary}', '${answer.department}')`;
 
+  connection.query(queryString, function(err, result) {
+    if (err) throw err;
+    console.log("Record inserted" + result);
+  })
+} 
 function view(){
   console.log("view database");
 }
