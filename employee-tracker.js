@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-const { inherits } = require("util");
+
 
 var connection = mysql.createConnection({
 
@@ -18,7 +18,36 @@ connection.connect(function(err) {
 
 // Initiallizes Program
 function init() {
-  console.log("Program initialized");
-  
+  return inquirer.prompt([
+    {
+      type: "list",
+      name: "options",
+      choices: ["Add", "View", "Update"],
+      message: "Hello.  Please choose if you would like to add, view, or update the database."
+    }
+    ])
+    .then(answers => {
+      if (answers.options === 'Add') {
+        add();
+      }
+      else if (answers.options === 'View') {
+        view();
+      }
+      else {
+        update();
+      }
+    })
+}
+
+function add(){
+  console.log("add to database");
+} 
+
+function view(){
+  console.log("view database");
+}
+
+function update(){
+  console.log("update database");
 }
 
