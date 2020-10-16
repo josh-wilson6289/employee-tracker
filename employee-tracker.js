@@ -1,15 +1,24 @@
-var mysql = require("mysql");
+const inquirer = require("inquirer");
+const mysql = require("mysql");
+const { inherits } = require("util");
 
 var connection = mysql.createConnection({
-  host: "localhost",
+
   port: 3306,
   user: "root",
   password: "ABCabc123!!",
-  database: "employee-tracker"
+  database: "employee_tracker"
 });
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadID + "\n");
+  console.log("connected as id " + connection.threadID);
+  init();
 })
+
+// Initiallizes Program
+function init() {
+  console.log("Program initialized");
+  
+}
 
