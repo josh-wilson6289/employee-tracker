@@ -33,6 +33,7 @@ function init() {
     });
 }
 
+// Shows users whichever table they chose
 function viewTable(table) {
   let queryString = `SELECT * FROM ${table}`; 
   
@@ -43,6 +44,7 @@ function viewTable(table) {
   });
 }
 
+// Asks user whether they'd like to create or update table
 function tableChange(table) {
   return inquirer.prompt([
   {
@@ -60,7 +62,7 @@ function tableChange(table) {
           editTable(table);
           break;
         case "Exit":
-          console.log("Exiting");
+          init();
           break;
       }
     })
@@ -84,7 +86,11 @@ function newEntry(table) {
         ])
           .then(answer => {
             queryString = `INSERT INTO department (name) VALUES ('${answer.name}')`
-            console.log(queryString);
+            connection.query(queryString, function(err, res) {
+              if (err) throw err;
+            })
+            console.log("Added department");
+            init();
           })
     break;
     case "Role":
