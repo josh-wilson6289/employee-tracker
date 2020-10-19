@@ -72,9 +72,8 @@ function tableChange(table) {
 function newEntry(table) {
   let questions = [];
   let queryString = "";
-  console.log(table);
 
-// Add new department
+  // Add new department
   switch(table){
     case "Department":
       questions.push("Department:");
@@ -96,7 +95,7 @@ function newEntry(table) {
           })
     break;
 
-// Add new Role
+    // Add new Role
     case "Role":
       questions.push("Title:", "Salary:", "Department:");
       queryString = "SELECT * FROM department";
@@ -138,7 +137,62 @@ function newEntry(table) {
           })
         });
       })
-     
+    break;
+
+    // Add new employee
+    case "Employee":
+      questions.push("First name:", "Last name:", "Role:", "Manager:");
+      // queryString = "SELECT role_id FROM employee LEFT JOIN role ON employee.role_id = role.id";
+      queryString = "SELECT * FROM role";
+      connection.query(queryString, function(err, roleRes) {
+        if (err) throw err;
+      queryString = "SELECT * FROM employee";
+      connection.query(queryString, function(err, employeeRes) {
+        if (err) throw err;
+      
+      inquirer.prompt([
+        {
+          type: "input",
+          name: "firstName",
+          message: questions[0]
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: questions[1]
+        },
+        {
+          type: "list",
+          name: "roleId",
+          choices: roleRes.map(role => {
+            return {
+              name: role.title,
+              value: role.id
+            }
+          }),
+          message: questions[2]
+        },
+        { type: "list",
+          name: "managerId",
+          choices: employeeRes.map(employee => {
+            return {
+              name: employee.first_name + " " + employee.last_name,
+              value: employee.id
+            }
+          }),
+          message: questions[3]
+        }
+      ])
+      .then(answer => {
+        queryString = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.firstName}', '${answer.lastName}', '${answer.roleId}', '${answer.managerId}')`;
+        connection.query(queryString, function(err, res) {
+          if (err) throw err;
+        })
+          console.log("Added employee");
+          init();
+        })
+      }) 
+    })  
     break;
   }
 
@@ -149,74 +203,3 @@ function editTable(table) {
   console.log(`Editing ${table}`)
 }
 
-// // Code block to add to table
-// function add(){
-//   return inquirer.prompt([
-//     {
-//       type: "list",
-//       name: "addToTable",
-//       choices: ["Departments", "Roles", "Employees"],
-//       message: "Which table would you like to add to?"
-//     }
-//     ])
-//     .then(answer => {
-//       addToTable(answer.addToTable);
-//     })
-// } 
-
-// // Uses inquirer to ask correct questions for given table
-// function addToTable(selectedTable) {
-//   let questions = [];
-  
-//   switch(selectedTable){
-//     case 'Departments':
-//       questions.push("New department name:");
-//       inquirer.prompt([
-//         {
-//           type: "input",
-//           name: "department",
-//           message: questions[0]
-//         }
-//       ])
-//         .then(answer => {
-//           addDepartment(answer);
-//         });
-//       break;
-//     case 'Roles':
-//       questions.push("Title:", "Salary:", "Department:");
-//       inquirer.prompt([
-//         {
-//           type: "input",
-//           name: "title",
-//           message: questions[0]
-//         },
-//         {
-//           type: "input",
-//           name: "salary",
-//           message: questions[1]
-//         },
-//         {
-//           type: "input",
-//           name: "department",
-//           message: questions[2]
-//         }
-//       ])
-//         .then(answer => {
-//           addRole(answer);
-//         })
-//       break;
-//     case 'Employees':
-//       questions.push("First name:", "Last name:", "Role:", "Manager:")
-//       break;
-//   }
-// }
-
-// function addDepartment(answer) {
-//   let id = Math.floor(Math.random() * 1000);
-//   let queryString = `INSERT INTO department (id, name) VALUES ('${id}', '${answer.department}')`;
-  
-//   connection.query(queryString, function (err, result) {
-//     if (err) throw err;
-//     console.log("Record inserted" + result);
-//   });
-// }
