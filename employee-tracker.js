@@ -195,11 +195,59 @@ function newEntry(table) {
     })  
     break;
   }
-
-  
 }
 
 function editTable(table) {
   console.log(`Editing ${table}`)
+  let questions = [];
+  let queryString = "";
+
+  switch(table){
+    case "Role":
+      questions.push("Employee:", "Role:");
+      queryString = "SELECT * FROM role";
+      connection.query(queryString, function(err, roleRes) {
+        if (err) throw err;
+      
+      queryString = "SELECT * FROM employee";
+      connection.query(queryString, function(err, employeeRes) {
+        if (err) throw err;
+        
+        inquirer.prompt([
+          {
+            type: "list",
+            name: "employeeId",
+            choices: employeeRes.map(employee =>{
+              return {
+                name: employee.first_name + " " + employee.last_name,
+                value: employee.id
+              }
+            }),
+              message: questions[0]          
+          },
+          {
+            type: "list",
+            name: "updatedRole",
+            choices: roleRes.map(role =>{
+              return {
+                name: role.title,
+                value: role.id
+              }
+            }),
+            message: questions[1]
+          }
+        ])
+        .then(answer => {
+          queryString = `UPDATE employee SET role_id = ${answer.updatedRole} WHERE id = ${answer.employeeId}`
+          connection.query(queryString, function(err, res) {
+            if (err) throw err;
+
+            console.log("Updated Employee Role");
+          })
+        })
+      })
+    })
+      break;
+  }
 }
 
