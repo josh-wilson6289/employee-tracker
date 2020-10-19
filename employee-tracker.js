@@ -46,28 +46,71 @@ function viewTable(table) {
 
 // Asks user whether they'd like to create or update table
 function tableChange(table) {
-  return inquirer.prompt([
-  {
-    type: "list",
-    name: "choices",
-    choices: ["Add to table", "Edit table", "Exit"]
-  }
-  ])
-    .then(answer => {
-      switch(answer.choices) {
-        case "Add to table":
-          newEntry(table);
-          break;
-        case "Edit table": 
-          editTable(table);
-          break;
-        case "Exit":
-          init();
-          break;
-      }
-    })
-}
+  switch(table) {
+    case "Department":
+      return inquirer.prompt([
+        {
+          type: "list",
+          name: "choices",
+          choices: ["Add department", "Exit"]
+        }
+      ])    
+      .then(answer => {
+        switch(answer.choices) {
+          case "Add department":
+            newEntry(table);
+            break;
+          case "Exit":
+            init();
+            break;
+        }
+      })
+    break;
+    
+    case "Role":
+      return inquirer.prompt([
+        {
+          type: "list",
+          name: "choices",
+          choices: ["Add role", "Exit"]
+        }
+      ])
+      .then(answer => {
+          switch(answer.choices) {
+            case "Add role":
+              newEntry(table);
+              break;
+            case "Exit":
+              init();
+              break;
+          }
+       })
+    break;
 
+    case "Employee": 
+       return inquirer.prompt([
+         {
+           type: "list",
+           name: "choices",
+           choices: ["Add an employee", "Update employee role", "Exit"]
+         }
+       ])
+       .then(answer => {
+         switch(answer.choices) {
+           case "Add an employee":
+             newEntry(table);
+             break;
+            case "Update employee role":
+              editTable(table);
+              break;
+            case "Exit":
+              init();
+              break;
+         }
+       })
+    break;
+  }
+}
 // New database entries
 function newEntry(table) {
   let questions = [];
@@ -197,13 +240,15 @@ function newEntry(table) {
   }
 }
 
+// Update table function
 function editTable(table) {
   console.log(`Editing ${table}`)
   let questions = [];
   let queryString = "";
 
+// Update employee role
   switch(table){
-    case "Role":
+    case "Employee":
       questions.push("Employee:", "Role:");
       queryString = "SELECT * FROM role";
       connection.query(queryString, function(err, roleRes) {
@@ -243,11 +288,13 @@ function editTable(table) {
             if (err) throw err;
 
             console.log("Updated Employee Role");
+            init();
           })
         })
       })
     })
       break;
+      
   }
 }
 
