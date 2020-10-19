@@ -68,11 +68,13 @@ function tableChange(table) {
     })
 }
 
+// New database entries
 function newEntry(table) {
   let questions = [];
   let queryString = "";
   console.log(table);
 
+// Add new department
   switch(table){
     case "Department":
       questions.push("Department:");
@@ -93,6 +95,8 @@ function newEntry(table) {
             init();
           })
     break;
+
+// Add new Role
     case "Role":
       questions.push("Title:", "Salary:", "Department:");
       queryString = "SELECT * FROM department";
@@ -125,8 +129,13 @@ function newEntry(table) {
           }
         ])
         .then(answer => {
-          queryString = `INSERT INTO role (title, salary, department_id) VALUES ('${answer.title}, '${answer.salary}', '${answer.departmentId}')`;
-          console.log(queryString);
+          queryString = `INSERT INTO role (title, salary, department_id) VALUES ('${answer.title}', '${answer.salary}', '${answer.departmentId}')`;
+          
+          connection.query(queryString, function(err, res) {
+            if (err) throw err;
+            console.log("Added new role");
+            init();
+          })
         });
       })
      
